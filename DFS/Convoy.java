@@ -7,19 +7,27 @@ class State {
     private State parent;
     private String description;
     private double time;
+    private int depth;
+
+    public State(ArrayList<Vehicle> vehicles, State parent, String description, double time, int depth) {
+        this.vehicles = vehicles;
+        this.parent = parent;
+        this.description = description;
+        this.time = time;
+        this.depth = depth;
+    }
 
     public State(ArrayList<Vehicle> vehicles, State parent, String description) {
         this.vehicles = vehicles;
         this.parent = parent;
         this.description = description;
         this.time = 0;
+        this.depth = 0;
     }
-
 
     public State getParent() {
         return parent;
     }
-
 
     public double getTime() {
         return time;
@@ -27,6 +35,14 @@ class State {
 
     public void setTime(double time) {
         this.time = time;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
     }
 
     public boolean isGoal() {
@@ -51,7 +67,7 @@ class State {
             if (max <= maxLoad) {
                 State newState = new State(copyVehicles(newVehicles), this, "Move " + movedVehicles);
                 newState.setTime(time + (double) length / Collections.min(vehicleSpeed) * 60);
-                // System.out.println(newState);
+                newState.setDepth(depth + 1);
                 successors.add(newState);
             } else {
                 break;
@@ -68,8 +84,8 @@ class State {
             numbers.add(v.getNumber());
         }
         str = isGoal() ? "None" : numbers.toString();
-        str = String.format("%-20s%-20s: %s", description, description.equals("Initial State") ? "Vehicles" :
-                "Remaining Vehicles", str);
+        str = String.format("%-20s%-20s: %s", description,
+                description.equals("Initial State") ? "Vehicles" : "Remaining Vehicles", str);
         return str;
     }
 }
@@ -113,6 +129,8 @@ public class Convoy {
         int maxLoad = Integer.parseInt(userInputs[0]);
         int length = Integer.parseInt(userInputs[1]);
         int numVehicle = Integer.parseInt(userInputs[2]);
+        int totalStatesVisited = 0;
+        int maxFrontierSize = 1;
 
         for (int x = 0; x < numVehicle; x++) {
             String convoyInput = kbd.nextLine();
@@ -125,25 +143,24 @@ public class Convoy {
         ArrayList<State> frontier = new ArrayList<>();
         frontier.add(initialState);
 
-        ArrayList<State> goalStates = new ArrayList<>();
 
         while (frontier.size() > 0) {
             State currentState = frontier.remove(frontier.size() - 1);
+            totalStatesVisited++;
             if (currentState.isGoal()) {
-                //showSolution(currentState);
-                goalStates.add(currentState);
-                //System.out.println("\n\n-------------\n");
-                //return;
+                showSolution(currentState, totalStatesVisited, maxFrontierSize);
+                return;
             } else {
                 ArrayList<State> successorStates = currentState.expand(maxLoad, length);
                 frontier.addAll(successorStates);
+
+                maxFrontierSize = Math.max(maxFrontierSize, frontier.size());
             }
         }
-        showOptimalSolution(goalStates);
-        //System.out.println("No Solution");
+        System.out.println("No Solution");
     }
 
-    public static void showSolution(State state) {
+    public static void showSolution(State state, int totalStatesVisited, int maxFrontierSize) {
         ArrayList<State> path = new ArrayList<>();
         while (state != null) {
             path.add(0, state);
@@ -155,15 +172,18 @@ public class Convoy {
             System.out.println(st);
         }
         System.out.printf("Time Elapsed: %.1f minutes", path.get(path.size() - 1).getTime());
+        System.out.printf("\nNumber of Batches: %d", path.get(path.size() - 1).getDepth());
+        System.out.printf("\nTotal States Visited: %d\n", totalStatesVisited);
+        System.out.printf("Maximum Size of Frontier: %d\n", maxFrontierSize);
     }
 
-    public static void showOptimalSolution(ArrayList<State> states){
+    /* public static void showOptimalSolution(ArrayList<State> states) {
         State currentGoal = states.get(0);
-        for (State goal: states) {
+        for (State goal : states) {
             if (currentGoal.getTime() > goal.getTime()) {
                 currentGoal = goal;
             }
         }
         showSolution(currentGoal);
-    }
+    } */
 }

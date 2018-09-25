@@ -8,6 +8,7 @@ class State {
     private String description;
     private double time;
     private int depth;
+    private int bf = 0; //branching factor
 
     public State(ArrayList<Vehicle> vehicles, State parent, String description, double time, int depth) {
         this.vehicles = vehicles;
@@ -27,6 +28,10 @@ class State {
 
     public State getParent() {
         return parent;
+    }
+
+    public int getBranchingFactor(){
+        return bf;
     }
 
     public double getTime() {
@@ -73,6 +78,7 @@ class State {
                 break;
             }
         }
+        bf = successors.size();
         return successors;
     }
 
@@ -159,11 +165,14 @@ public class Convoy {
         }
         System.out.println("No Solution");
     }
-
     public static void showSolution(State state, int totalStatesVisited, int maxFrontierSize) {
         ArrayList<State> path = new ArrayList<>();
+        int maxBF = 0;
         while (state != null) {
             path.add(0, state);
+            if (maxBF < state.getBranchingFactor()) {
+                maxBF = state.getBranchingFactor();                
+            }
             state = state.getParent();
         }
 
@@ -171,19 +180,10 @@ public class Convoy {
         for (State st : path) {
             System.out.println(st);
         }
+        System.out.println("Maximum Branching Factor: " + maxBF);
         System.out.printf("Time Elapsed: %.1f minutes", path.get(path.size() - 1).getTime());
         System.out.printf("\nNumber of Batches: %d", path.get(path.size() - 1).getDepth());
         System.out.printf("\nTotal States Visited: %d\n", totalStatesVisited);
         System.out.printf("Maximum Size of Frontier: %d\n", maxFrontierSize);
     }
-
-    /* public static void showOptimalSolution(ArrayList<State> states) {
-        State currentGoal = states.get(0);
-        for (State goal : states) {
-            if (currentGoal.getTime() > goal.getTime()) {
-                currentGoal = goal;
-            }
-        }
-        showSolution(currentGoal);
-    } */
 }

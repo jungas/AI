@@ -9,7 +9,7 @@ class State implements Comparable<State> {
     private String description;
     private double time;
     private int depth;
-    private int bf = 0; //branching factor
+    private int bf = 0; // branching factor
 
     public State(ArrayList<Vehicle> vehicles, State parent, String description, double time, int depth) {
         this.vehicles = vehicles;
@@ -31,7 +31,7 @@ class State implements Comparable<State> {
         return parent;
     }
 
-    public int getBranchingFactor(){
+    public int getBranchingFactor() {
         return bf;
     }
 
@@ -176,7 +176,7 @@ public class Convoy {
         while (state != null) {
             path.add(0, state);
             if (maxBF < state.getBranchingFactor()) {
-                maxBF = state.getBranchingFactor();                
+                maxBF = state.getBranchingFactor();
             }
             state = state.getParent();
         }
@@ -185,9 +185,10 @@ public class Convoy {
         for (State st : path) {
             System.out.println(st);
         }
+
+        System.out.printf("\nTime Elapsed: %.1f minutes\n", path.get(path.size() - 1).getTime());
         System.out.println("Maximum Branching Factor: " + maxBF);
-        System.out.printf("Time Elapsed: %.1f minutes", path.get(path.size() - 1).getTime());
-        System.out.printf("\nNumber of Batches: %d", path.get(path.size() - 1).getDepth());
+        System.out.printf("Number of Batches: %d", path.get(path.size() - 1).getDepth());
         System.out.printf("\nTotal States Visited: %d\n", totalStatesVisited);
         System.out.printf("Maximum Size of Frontier: %d\n", maxFrontierSize);
     }

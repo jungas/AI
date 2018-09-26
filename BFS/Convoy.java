@@ -180,9 +180,10 @@ public class Convoy {
         for (State st : path) {
             System.out.println(st);
         }
+        
+        System.out.printf("\nTime Elapsed: %.1f minutes\n", path.get(path.size() - 1).getTime());
         System.out.println("Maximum Branching Factor: " + maxBF);
-        System.out.printf("Time Elapsed: %.1f minutes", path.get(path.size() - 1).getTime());
-        System.out.printf("\nNumber of Batches: %d", path.get(path.size() - 1).getDepth());
+        System.out.printf("Number of Batches: %d", path.get(path.size() - 1).getDepth());
         System.out.printf("\nTotal States Visited: %d\n", totalStatesVisited);
         System.out.printf("Maximum Size of Frontier: %d\n", maxFrontierSize);
     }

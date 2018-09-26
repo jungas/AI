@@ -71,7 +71,7 @@ class State implements Comparable<State> {
         str = isGoal() ? "None" : numbers.toString();
         str = String.format("%-20s%-20s: %s", description, description.equals("Initial State") ? "Vehicles" :
                 "Remaining Vehicles", str);
-        return str;
+        return str + "\t" + time;
     }
 
     @Override
@@ -136,8 +136,7 @@ public class Convoy {
             State currentState = frontier.remove();
             if (currentState.isGoal()) {
                 showSolution(currentState);
-                System.out.println("\n\n---------------\n");
-                //return;
+                return;
             } else {
                 ArrayList<State> successorStates = currentState.expand(maxLoad, length);
                 frontier.addAll(successorStates);

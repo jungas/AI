@@ -51,7 +51,6 @@ class State {
             if (max <= maxLoad) {
                 State newState = new State(copyVehicles(newVehicles), this, "Move " + movedVehicles);
                 newState.setTime(time + (double) length / Collections.min(vehicleSpeed) * 60);
-                // System.out.println(newState);
                 successors.add(newState);
             } else {
                 break;
@@ -125,22 +124,17 @@ public class Convoy {
         ArrayList<State> frontier = new ArrayList<>();
         frontier.add(initialState);
 
-        ArrayList<State> goalStates = new ArrayList<>();
-
         while (frontier.size() > 0) {
-            State currentState = frontier.remove(0);
+            State currentState = frontier.remove(frontier.size() - 1);
             if (currentState.isGoal()) {
-                //showSolution(currentState);
-                goalStates.add(currentState);
-                //System.out.println("\n\n-------------\n");
-                //return;
+                showSolution(currentState);
+                return;
             } else {
                 ArrayList<State> successorStates = currentState.expand(maxLoad, length);
                 frontier.addAll(successorStates);
             }
         }
-        showOptimalSolution(goalStates);
-        //System.out.println("No Solution");
+        System.out.println("No Solution");
     }
 
     public static void showSolution(State state) {
@@ -154,16 +148,6 @@ public class Convoy {
         for (State st : path) {
             System.out.println(st);
         }
-        System.out.printf("Time Elapsed: %.1f minutes", path.get(path.size()-1).getTime());
-    }
-
-    public static void showOptimalSolution(ArrayList<State> states){
-        State currentGoal = states.get(0);
-        for (State goal: states) {
-            if (currentGoal.getTime() > goal.getTime()) {
-                currentGoal = goal;
-            }
-        }
-        showSolution(currentGoal);
+        System.out.printf("Time Elapsed: %.1f minutes", path.get(path.size() - 1).getTime());
     }
 }

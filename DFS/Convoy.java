@@ -8,14 +8,15 @@ class State {
     private String description;
     private double time;
     private int depth;
-    private int bf = 0; //branching factor
+    private int maxBranchingFactor;
 
-    public State(ArrayList<Vehicle> vehicles, State parent, String description, double time, int depth) {
+    public State(ArrayList<Vehicle> vehicles, State parent, String description, double time, int depth, int maxBranchingFactor) {
         this.vehicles = vehicles;
         this.parent = parent;
         this.description = description;
         this.time = time;
         this.depth = depth;
+        this.maxBranchingFactor = maxBranchingFactor;
     }
 
     public State(ArrayList<Vehicle> vehicles, State parent, String description) {
@@ -24,14 +25,11 @@ class State {
         this.description = description;
         this.time = 0;
         this.depth = 0;
+        this.maxBranchingFactor = 0;
     }
 
     public State getParent() {
         return parent;
-    }
-
-    public int getBranchingFactor(){
-        return bf;
     }
 
     public double getTime() {
@@ -50,6 +48,14 @@ class State {
         this.depth = depth;
     }
 
+    public int getMaxBranchingFactor(){
+        return maxBranchingFactor;
+    }
+
+    public void setMaxBranchingFactor(int maxBranchingFactor){
+        this.maxBranchingFactor = maxBranchingFactor;
+    }
+
     public boolean isGoal() {
         return vehicles.size() == 0;
     }
@@ -62,10 +68,12 @@ class State {
         ArrayList<State> successors = new ArrayList<>();
         ArrayList<Vehicle> newVehicles = copyVehicles(vehicles);
         int max = 0;
+        int branchingFactor = 0;
         ArrayList<Integer> movedVehicles = new ArrayList<>();
         ArrayList<Integer> vehicleSpeed = new ArrayList<>();
         while (newVehicles.size() > 0) {
             Vehicle currentVehicle = newVehicles.remove(0);
+            branchingFactor ++;
             movedVehicles.add(currentVehicle.getNumber());
             vehicleSpeed.add(currentVehicle.getMaxSpeed());
             max += currentVehicle.getWeight();
@@ -73,6 +81,7 @@ class State {
                 State newState = new State(copyVehicles(newVehicles), this, "Move " + movedVehicles);
                 newState.setTime(time + (double) length / Collections.min(vehicleSpeed) * 60);
                 newState.setDepth(depth + 1);
+                newState.setMaxBranchingFactor(Math.max(maxBranchingFactor, branchingFactor));
                 successors.add(newState);
             } else {
                 break;
@@ -167,12 +176,8 @@ public class Convoy {
     }
     public static void showSolution(State state, int totalStatesVisited, int maxFrontierSize) {
         ArrayList<State> path = new ArrayList<>();
-        int maxBF = 0;
         while (state != null) {
             path.add(0, state);
-            if (maxBF < state.getBranchingFactor()) {
-                maxBF = state.getBranchingFactor();                
-            }
             state = state.getParent();
         }
 
@@ -180,9 +185,9 @@ public class Convoy {
         for (State st : path) {
             System.out.println(st);
         }
-        System.out.println("Maximum Branching Factor: " + maxBF);
         System.out.printf("Time Elapsed: %.1f minutes", path.get(path.size() - 1).getTime());
         System.out.printf("\nNumber of Batches: %d", path.get(path.size() - 1).getDepth());
+        System.out.printf("\nMaximum Branching Factor: %d", path.get(path.size() - 1).getMaxBranchingFactor());
         System.out.printf("\nTotal States Visited: %d\n", totalStatesVisited);
         System.out.printf("Maximum Size of Frontier: %d\n", maxFrontierSize);
     }

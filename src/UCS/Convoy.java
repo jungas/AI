@@ -100,7 +100,7 @@ class State implements Comparable<State> {
 
     @Override
     public int compareTo(State state) {
-        return (int) this.getTime() - (int) state.getTime();
+        return (this.getTime() > state.getTime()) ? 1 : -1;
     }
 }
 
